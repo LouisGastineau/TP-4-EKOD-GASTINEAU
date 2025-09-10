@@ -1,7 +1,7 @@
 # Task Manager REST API
 
-A simple REST API for managing tasks, built with Node.js and Express.
-Readme created with the help of github copilot, because i'm bad at that stuff
+- A simple REST API for managing tasks, built with Node.js and Express.
+- Readme created with the help of github copilot, because i'm bad at that stuff
 
 ## Features
 
@@ -11,7 +11,7 @@ Readme created with the help of github copilot, because i'm bad at that stuff
   - `PUT /tasks/:id`: Update an existing task
   - `DELETE /tasks/:id`: Delete a task
 - Each task has:
-  - `id` (number or string)
+  - `id` (number)
   - `title` (string)
   - `done` (boolean, indicates if the task is completed)
 
