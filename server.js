@@ -1,3 +1,4 @@
+const { query } = require('express');
 const express = require('express');
 const app = express();
 const port = 4000;
@@ -16,12 +17,12 @@ app.get('/tasks', (req, res) =>{
 });
 
 app.post('/tasks', (req, res) =>{
-    const { title, done } = req.body;
+    const { title, status } = req.body;
     const newTask = {
         id: tasks.length > 0 ?
         tasks[tasks.length - 1].id + 1 : 1,
         title,
-        done: done || false,
+        status: status || false,
     };
         tasks.push(newTask);
         res.status(200).json(newTask);
@@ -36,9 +37,9 @@ app.put('/tasks/:id', (req, res) =>{
         return
     }
 
-    const { title, done } = req.body;
+    const { title, status } = req.body;
     if (title !== undefined) task.title = title;
-    if (done !== undefined) task.done = done;
+    if (status !== undefined) task.status = status;
 
     res.json(task);
 });
