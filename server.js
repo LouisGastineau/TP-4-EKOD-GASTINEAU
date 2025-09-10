@@ -4,7 +4,7 @@ const port = 4000;
 
 app.use(express.json());
 
-let tasks = [{id: 0, title: "test", done: false}];
+let tasks = [{id: 0, title: "test", done: false} ,{id: 1, title: "lorem ipsum", done: false}];
 let id = 0;
 
 app.get('/', (req, res) =>{
@@ -29,14 +29,14 @@ app.post('/tasks', (req, res) =>{
 
 app.put('/tasks/:id', (req, res) =>{
     const taskId = parseInt(req.params.id);
-    const { title, done } = req.body;
     const task = tasks.find((t) => t.id === taskId);
 
     if(!task) {
-        return
         res.status(404).json({message: "Task not found"});
+        return
     }
 
+    const { title, done } = req.body;
     if (title !== undefined) task.title = title;
     if (done !== undefined) task.done = done;
 
@@ -48,8 +48,8 @@ app.delete('/tasks/:id', (req, res) =>{
     const index = tasks.findIndex((t) => t.id === taskId);
 
     if( index === -1) {
-        return
         res.status(404).json({message: "Task not found"});
+        return
     }
 
     const deletedTask = tasks.splice(index, 1);
