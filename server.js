@@ -5,7 +5,7 @@ const port = 4000;
 
 app.use(express.json());
 
-let tasks = [{id: 0, title: "test", done: false} ,{id: 1, title: "lorem ipsum", done: false}];
+let tasks = [{id: 0, title: "test", status: false} ,{id: 1, title: "lorem ipsum", status: false}];
 let id = 0;
 
 app.get('/', (req, res) =>{
