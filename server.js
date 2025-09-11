@@ -43,6 +43,16 @@ app.get('/tasks', (req, res) => {
         });
 });
 
+app.get('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    pool.query('SELECT * FROM tasks WHERE id = $1', [taskId])
+        .then(result => res.status(200).json(result.rows))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: "internal server error" });
+        });
+});
+
 app.post('/tasks', async (req, res) => {
     const { title, status } = req.body;
     try {
@@ -97,6 +107,23 @@ app.delete('/tasks/:id', async (req, res) =>{
     res.status(200).json({ message: "Task successfully deleted" });
 
 })
+
+app.put('/tasks/:id/complete', async (req, res) => {
+    const taskId = parseInt(req.params.id);
+
+    try {
+        const taskResult = await pool.query('SELECT * FROM tasks WHERE id = $1', [taskId]);
+        if (taskResult.rows.length === 0) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+        await pool.query('UPDATE tasks SET status = $1 WHERE id = $2', [true, taskId]);
+
+        res.status(200).json({ message: "Task marked as complete" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 app.listen(port, () =>{
     console.log(`The server is online and ready at http://localhost:${port}`);
