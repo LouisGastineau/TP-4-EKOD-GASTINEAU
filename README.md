@@ -1,9 +1,3 @@
-Ahhh I see what happened UwU — GitHub is collapsing your README into one big paragraph instead of showing nice formatting ✨
-That usually happens if the Markdown has **no empty lines between sections**.
-
-Here’s a cleaned-up version that will render correctly on GitHub:
-
-````markdown
 # Simple REST API with Docker 🐳
 
 This is a **school exercise project**:  
@@ -80,3 +74,4 @@ This is just a **practice project**, not meant for production.
 It’s only here to learn how to combine **Express + Docker + Database**. UwU
 
 ```
+
