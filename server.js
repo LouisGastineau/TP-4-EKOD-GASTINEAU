@@ -1,31 +1,52 @@
 const { query } = require('express');
 const express = require('express');
 const app = express();
-const port = 4000;
+const { Pool } = require('pg');
+require('dotenv').config();
+const port = 8080;
 
 app.use(express.json());
 
-let tasks = [{id: 0, title: "test", status: false} ,{id: 1, title: "lorem ipsum", status: false}];
-let id = 0;
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+});
+
+pool.connect((err, client, release) => {
+    if (err) {
+        return console.error("Erreur de connexion", err);
+    }
+    client.query('SELECT NOW()', (err, result) => {
+        release();
+        if (err) {
+            return console.error('Erreur lors du SELECT', err);
+        }
+        console.log('Connexion réussie ! Heure du serveur :', result.rows[0].now);
+    });
+});
+
+
 
 app.get('/', (req, res) =>{
     res.send('hello');
 });
 
 app.get('/tasks', (req, res) =>{
-    res.json(tasks);
+    const result = pool.query('SELECT * FROM tasks');
+    result.then(function(result){
+        res.status(200).json(result);
+    })
 });
 
 app.post('/tasks', (req, res) =>{
     const { title, status } = req.body;
-    const newTask = {
-        id: tasks.length > 0 ?
-        tasks[tasks.length - 1].id + 1 : 1,
-        title,
-        status: status || false,
-    };
-        tasks.push(newTask);
-        res.status(200).json(newTask);
+    const result = pool.query('INSERT INTO tasks (title, status) VALUES ($1, $2) RETURNING *', [title, status]);
+    result.then(function(result){
+        res.status(200).json(result.rows[0]);
+    })
 })
 
 app.put('/tasks/:id', (req, res) =>{
