@@ -34,49 +34,67 @@ app.get('/', (req, res) =>{
     res.send('hello');
 });
 
-app.get('/tasks', (req, res) =>{
-    const result = pool.query('SELECT * FROM tasks');
-    result.then(function(result){
-        res.status(200).json(result);
-    })
+app.get('/tasks', (req, res) => {
+    pool.query('SELECT * FROM tasks')
+        .then(result => res.status(200).json(result.rows))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: "internal server error" });
+        });
 });
 
-app.post('/tasks', (req, res) =>{
+app.post('/tasks', async (req, res) => {
     const { title, status } = req.body;
-    const result = pool.query('INSERT INTO tasks (title, status) VALUES ($1, $2) RETURNING *', [title, status]);
-    result.then(function(result){
-        res.status(200).json(result.rows[0]);
-    })
-})
-
-app.put('/tasks/:id', (req, res) =>{
-    const taskId = parseInt(req.params.id);
-    const task = tasks.find((t) => t.id === taskId);
-
-    if(!task) {
-        res.status(404).json({message: "Task not found"});
-        return
+    try {
+        const check = await pool.query('SELECT title FROM tasks WHERE title = $1', [title]);
+        if (check.rows.length > 0) {
+            return res.status(400).json({ message: "task already exists" });
+        }
+        const insert = await pool.query(
+            'INSERT INTO tasks (title, status) VALUES ($1, $2) RETURNING *',
+            [title, status]
+        );
+        res.status(201).json(insert.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "internal server error" });
     }
-
-    const { title, status } = req.body;
-    if (title !== undefined) task.title = title;
-    if (status !== undefined) task.status = status;
-
-    res.json(task);
 });
 
-app.delete('/tasks/:id', (req, res) =>{
+app.put('/tasks/:id', async (req, res) => {
     const taskId = parseInt(req.params.id);
-    const index = tasks.findIndex((t) => t.id === taskId);
 
-    if( index === -1) {
-        res.status(404).json({message: "Task not found"});
-        return
+    try {
+        const taskResult = await pool.query('SELECT * FROM tasks WHERE id = $1', [taskId]);
+        if (taskResult.rows.length === 0) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        const { title, status } = req.body;
+        if (title !== undefined) {
+            await pool.query('UPDATE tasks SET title = $1 WHERE id = $2', [title, taskId]);
+        }
+        if (status !== undefined) {
+            await pool.query('UPDATE tasks SET status = $1 WHERE id = $2', [status, taskId]);
+        }
+
+        res.status(200).json({ message: "Task successfully updated" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+app.delete('/tasks/:id', async (req, res) =>{
+    const taskId = parseInt(req.params.id);
+    
+    const taskResult = await pool.query('SELECT * FROM tasks WHERE id = $1', [taskId]);
+    if (taskResult.rows.length === 0) {
+        return res.status(404).json({ message: "Task not found" });
     }
 
-    const deletedTask = tasks.splice(index, 1);
-    res.status(200).json(deletedTask, {message: "Task succesfully deleted"});
-
+    await pool.query('DELETE FROM tasks WHERE id = $1', [taskId]);
+    res.status(200).json({ message: "Task successfully deleted" });
 
 })
 
