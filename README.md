@@ -68,7 +68,8 @@ docker-compose up --build
 
 ---
 
-## 🎓 Note
+[## 🎓 Note] (https://louisgastineau-4630052.postman.co/workspace/Gaste's-Workspace~f1425d52-e733-4c55-82b9-829fc62ad983/request/48296522-689df85b-4f0b-4700-9aa6-b946fd6397de?action=share&creator=48296522&ctx=documentation) Postman Requests to use API
 
 This is just a **practice project**, not meant for production.
 It’s only here to learn how to combine **Express + Docker + Database**. UwU
+
