@@ -72,5 +72,3 @@ docker-compose up --build
 
 This is just a **practice project**, not meant for production.
 It’s only here to learn how to combine **Express + Docker + Database**. UwU
-
-```
